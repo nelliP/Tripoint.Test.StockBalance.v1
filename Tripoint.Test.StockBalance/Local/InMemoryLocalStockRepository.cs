@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Tripoint.Test.StockBalance.Models;
+using Tripoint.Test.StockBalance.Utilities;
 
 namespace Tripoint.Test.StockBalance.Local
 {
@@ -23,14 +27,14 @@ namespace Tripoint.Test.StockBalance.Local
         }
 
         public Task<StockBalanceDetails> GetBalance(string articleName)
-        {
-            /*
-             * Implement this method as part of your test.
-             *
-             * The return statement below is just a placeholder in order
-             * to be able to compile the project.
-             */
-            return Task.FromResult(new StockBalanceDetails(default, default));
+        {            
+            int result;
+
+            var key = RetrieveKeyCaseInsensitive.RetrieveKey(articleName, _localStock);
+
+            return _localStock.TryGetValue(key ?? articleName, out result)
+                ? Task.FromResult(new StockBalanceDetails(key, result))
+                : null;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Tripoint.Test.StockBalance.Models;
+using Tripoint.Test.StockBalance.Utilities;
 
 namespace Tripoint.Test.StockBalance.Remote
 {
@@ -11,11 +13,11 @@ namespace Tripoint.Test.StockBalance.Remote
      */
     public class FakeRemoteStockService : IRemoteStockService
     {
-        private readonly Dictionary<string, int> _localStock;
+        private readonly Dictionary<string, int> _remoteStock;
 
         public FakeRemoteStockService()
         {
-            _localStock = new Dictionary<string, int>
+            _remoteStock = new Dictionary<string, int>
             {
                 {"Nishiki All Road", 44},
                 {"Speedster Gravel 30", 3},
@@ -26,13 +28,13 @@ namespace Tripoint.Test.StockBalance.Remote
 
         public Task<StockBalanceDetails> GetBalance(string articleName)
         {
-            /*
-             * Implement this method as part of your test.
-             *
-             * The return statement below is just a placeholder in order
-             * to be able to compile the project.
-             */
-            return Task.FromResult(new StockBalanceDetails(default, default));
+            int result;
+
+            var key = RetrieveKeyCaseInsensitive.RetrieveKey(articleName, _remoteStock);
+
+            return _remoteStock.TryGetValue(key ?? articleName, out result)
+                ? Task.FromResult(new StockBalanceDetails(key, result))
+                : null;
         }
     }
 }
